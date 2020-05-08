@@ -1,0 +1,364 @@
+---
+title: "STAT 341/641 Lab: Week One"
+author: "Muhammad Ahmad"
+date: "1/26/2020"
+output: html_document
+---
+---
+
+**STAT 341/641:**        Intro to EDA and Statistical Computing  
+**Lab #1:**              Ggplot  
+**Teaching Assistant:**  "Fill in the name of your TA"" 
+
+* * *
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Directions:**  The following contains tasks you must complete to receive full credit for this homework.  Consult the R markdown cheatsheet on canvas if you have questions about markdown syntax.
+
+* * *
+
+#**Task One:  Chapter 3 of R for Data Science**  
+
+Navigate to https://r4ds.had.co.nz/.  You will work through sections 3.1 to 3.10 in this laboratory.  Replicate each computation performed in the chapter and answer the associated questions.
+
+
+
+##3.1: Introduction. 
+
+**Solution:**  (Write your code in the following block.  You can add additional blocks to in order to write text between the blocks.) 
+```{r}
+library(tidyverse)
+
+```
+##3.2: First steps
+
+**Solution:**  
+```{r}
+ggplot(data = mpg) 
+```
+```{r}
+ggplot2::mpg 
+```
+
+```{r}
+#There are 234 rows 
+```
+
+```{r}
+?mpg 
+#drv describes whether the car is front wheel rear wheel or 4 wheel drive
+```
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x=cyl, y=hwy))
+```
+
+```{r}
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(y=drv, x=class))
+
+```
+```{r}
+#Both are categorical variables so scatter plot isn't useful. We can't determine correllation trend by looking at scatter plot of such variables.
+```
+
+##3.3: Aesthetic mappings 
+
+**Solution:**  
+```{r}
+#1.What’s gone wrong with this code? Why are the points not blue?
+#color is defined in aesthetics which means that ggplot library will consider to colour the plot based on a variable named "color". 
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy), color = "blue")
+
+```
+```{r}
+#Which variables in mpg are categorical? Which variables are continuous? (Hint: type ?mpg to read the documentation for the dataset). How can you see this information when you run mpg?
+#Answer: fl, trans, drv, class, trans, manufacturer, model all are categorical, rest are continous variables. You can see whether data is char or int type, however variable cylyinder is int but its categorical since it's discrete and defines characterstics of car.
+?mpg
+```
+```{r}
+#continious variable cannot be assigned to shape aesthetics.
+#The color aesthetics changes shades or intensity of color when assigned with Continious variable. 
+ggplot(data=mpg)+
+  geom_point(mapping = aes(x=displ, y=cty, color=year, size=year))
+```
+```{r}
+#It's not adivised to use size for discrete variable since it would be harder to differentiate between groups based on size when there are large number of groups 
+ggplot(data=mpg)+
+  geom_point(mapping = aes(x=displ, y=cty, color=drv, size=trans))
+```
+```{r}
+#Shape variable can take 6 groups hence a better way of doing this would be: 
+ggplot(data=mpg)+
+  geom_point(mapping = aes(x=displ, y=cty, color=trans,shape=drv, size=year))
+
+```
+```{r}
+#What happens if you map the same variable to multiple aesthetics?
+ggplot(data=mpg)+
+  geom_point(mapping = aes(x=displ, y=cty, color=drv,shape=drv, size=year))
+
+```
+```{r}
+ggplot(data=mpg)+
+  geom_point(mapping = aes(x=displ, y=cty, color=year, size=year))
+#nothing really special happens, now you have mulitple  aesthetics displaying your variable which is redudant in this case atleast.
+```
+
+#For shapes that have a border, you can colour the inside and outside separately, by using the stroke aesthetic to modify the width of the border
+
+#What happens if you map an aesthetic to something other than a variable name, like aes(colour = displ < 5)? Note, you’ll also need to specify x and y.
+```{r}
+ggplot(data=mpg)+
+  geom_point(mapping = aes(x=displ, y=cty, color=displ<5, size=year))
+#Answer:In sucg case aesthetic like colour will differentiate based on whether the statement is true or false.
+```
+##3.4: Common problems 
+#What happens if you facet on a continuous variable?
+
+
+
+**Solution:**  
+
+
+
+##3.5: Facets  
+
+**Solution:**  
+```{r}
+##Only biggest and smallest value of continious variable have plots.
+ggplot(data=mpg)+
+  geom_point(mapping = aes(x=displ, y=cty))+
+  facet_wrap(~year)
+
+```
+```{r}
+##Only biggest and smallest value of continious variable have plots.
+ggplot(data=mpg)+
+  geom_point(mapping = aes(x=displ, y=cty))+
+  facet_wrap(~year)
+
+```
+```{r}
+#it means they repersent that there is no observation with that particular intersection of groups, 
+ggplot(data=mpg)+
+  geom_point(mapping = aes(x=displ, y=cty))+
+  facet_grid(drv ~ cyl)
+
+```
+
+```{r}
+#both the plots show how many cylinders and drive type does an observation have.
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = drv, y = cyl))
+```
+```{r}
+#Its to specify that you do not want facet in the rows or columns dimension.
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_grid(drv~.)
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_grid(. ~ cyl)
+
+```
+```{r}
+#Its easier to see trends with respect to each group in facet, however if the dataset is large the graph would look very unclear since graphs are small and it would be better to use colour. 
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap(~ class, nrow = 2)
+```
+#Read ?facet_wrap. What does nrow do? What does ncol do? What other options control the layout of the individual panels? Why doesn’t facet_grid() have nrow and ncol arguments?
+
+```{r}
+#Read ?facet_wrap. What does nrow do? What does ncol do? What other options control the layout of the individual panels? Why doesn’t facet_grid() have nrow and ncol arguments?
+?facet_wrap
+# ncol and nrows define number of rows and columns. We can use scales, as.table, switch,dir  we can use as.table whether facet is laid out like a table or not and strip.position to change the layout. In facet_grid() columns and rows depends on number of groups in each characterstic that is specified hence we don't need to define column and rows.
+```
+```{r}
+#6.
+
+#Answer:There is more space available in columns since most screens are rectangular.
+```
+
+
+##3.6: Geometric objects
+
+**Solution:**  
+
+```{r}
+#1
+#I will use geom_histogram() for histogram graph, geom_line() or geom_smooth() for line graph, geom_boxplot() for boxplot graph and geom_area() for area chart  
+#2
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) + 
+  geom_point() + 
+  geom_smooth(se = FALSE)
+```
+#3
+```{r}
+ggplot(data = mpg)+
+  
+  geom_smooth(
+    mapping = aes(x = displ, y = hwy, color = drv),
+    show.legend = FALSE
+  )
+ggplot(data = mpg)+
+  
+  geom_smooth(
+    mapping = aes(x = displ, y = hwy, color = drv),
+    
+  )
+# show.legend=TRUE names the group of each line and show.legend=flase removes the name guide of each group. It was used earlier so that groups can be recognized by their color. 
+
+#4
+#se=True, argument shows the standard error by shading around the line, 
+
+#5
+#No it doesn't matter since both are same, you only need to assign aesthetics and data once, mentioning it again wouldn't make a difference.
+```
+```{r}
+#6
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point() + 
+  geom_smooth(se=FALSE)
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point() + 
+  geom_smooth(mapping=aes(group=drv),se=FALSE)
+
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color=drv)) + 
+  geom_point() + 
+  geom_smooth(se=FALSE)
+
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point(mapping=aes(color=drv)) + 
+  geom_smooth(se=FALSE)
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color=drv)) + 
+  geom_point() + 
+  geom_smooth(mapping=aes(linetype=drv),se=FALSE)
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point(mapping=aes(color=drv))  
+  
+```  
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point() + 
+  geom_smooth(mapping=aes(group=drv))
+
+##3.7: Statistical transformations  
+
+**Solution:** 
+#1
+
+
+#stat_summary is associated with geom_pointrange.
+
+```{r}
+ggplot(diamonds) +
+  geom_pointrange(aes(cut, depth, ymin = depth, ymax = depth))
+```
+#2
+# geom_bar() creates variables count and prop then graphs the count or prop data on the y axis. With geom_col can plot the values of any x variable against any y variable.
+#3
+```{r}
+?geom_point
+```
+
+#4
+#stat_smooth() computes the predicted value of y for x values.It also computes se of that value predicted.It can compute different methods such as lm, glm, lowess and etc. The statistic can be controlled with the method argument.
+#5
+# prop defines propotionality, if we don't assign group as 1 then it will take each cut data as idividual group.
+#6
+You can see the values by wrapping any plot that has geom_smooth() with ggplot_build().
+
+##3.8: Position adjustments 
+
+**Solution:**  
+#1
+There is a lot of points that overlap. We can add random variations to location of each points by adding random noise could be fixed by adding jitter.
+
+```{r}
+
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_point() +
+  geom_jitter()
+
+```
+#2 We can use width and height as parameter for variation in jitter
+
+#3
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_point() +
+  geom_jitter()
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + 
+  geom_point() +
+  geom_count()
+
+```
+#geom_count() controls the size of each point plotted based on the frequency of observations and doesn't add random noise. 
+
+#4
+# Default adjustment is position_dodge.(points moved by discrete amount)
+```{r}
+ggplot(data = mpg, mapping = aes(x = class, y = displ)) + 
+  geom_boxplot(aes(colour = drv))
+```
+
+##3.9: Coordinate systems
+
+**Solution:**  
+```{r}
+#1
+
+ggplot(mpg, aes(factor(1), fill = factor(drv))) +
+  geom_bar(width = 1) +
+  coord_polar(theta = 'y')
+
+
+```
+#2
+#It allows us to control labels in the plot.
+#3
+#coord_quickmap() preserves straight lines.coord_map() doesnt plot straight lines. coord_quickmap() adds lines adjusting to the spherical surface.
+
+#4
+#It shows that there is strong positive correlation between hwy and city mileage
+# Coordfixed() ensures that the ranges of axes are equal to the specified ratio by adjusting the plot aspect ratio (as mentioned in Documentation of coord_fixed() )
+
+
+##3.10: The layered grammar of graphics
+
+**Solution:**  
+```{r}
+
+
+```
+
+
+* * *
+
+#**Task Two:  The UFO data**  
+
+Read in the UFO data from canvas.  Use ggplot2, and any other commands you know in R to answer the following question:  "Is the distribution of UFO shapes similar in American states and Canadian provinces that share a border?"
+
+You may find the text *ggplot2 Elegant Graphics for Data Analysis* to be helpful.
+
+```{r}
+UFO<-read.csv("C:/Users/Muhammad Ahmad/Downloads/ufos_clean.csv")
+ggplot(data = UFO, mapping=aes(x = Shape))+
+  geom_bar(mapping = aes( y = ..prop..)) +
+  facet_wrap( ~ State)
+```
+
+
+* * *
